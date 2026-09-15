@@ -1,6 +1,11 @@
 name: Staging image
 
 on:
+  # workflow_dispatch alone is not enough: GitHub only offers it for workflows
+  # that exist on the default branch, and this one lives on a topic branch.
+  push:
+    branches:
+      - 'ci/**'
   workflow_dispatch:
     inputs:
       platforms:
@@ -34,7 +39,7 @@ jobs:
         with:
           context: .
           file: Dockerfile.build
-          platforms: ${{ inputs.platforms }}
+          platforms: ${{ inputs.platforms || 'linux/arm64' }}
           push: true
           tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
           build-args: VERSION=v3.7.1-gwsort-${{ github.sha }}
